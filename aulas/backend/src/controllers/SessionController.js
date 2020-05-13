@@ -14,4 +14,16 @@ module.exports = {
         }
         return response.json(ongs);
     },
+    
+    async indexAll (request,response){    
+        const { id } = request.body;
+
+        const ongs = await connection('ongs')
+        .select('*');
+
+        if(!ongs){
+            return response.status(401).json({ error: 'No Ong found with this ID' });
+        }
+        return response.json(ongs);
+    },
 }

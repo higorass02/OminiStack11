@@ -1,30 +1,52 @@
 const connection = require('../database/connection');
 
 module.exports = {
-    async index (request,response){    
-        const { page = 1 } = request.query;
+    // async index (request,response){    
+    //     const { page = 1 } = request.query;
 
-        const [count]  = await connection('incidents')
-        .count();
+    //     const [count]  = await connection('incidents')
+    //     .count();
         
-        console.log(count);
+    //     console.log(count);
         
+    //     const incidents = await connection('incidents')
+    //     .join('ongs','omg_id','=','incidents.omg_id')
+    //     .limit(5)
+    //     .offset((page - 1) * 5)
+    //     .select([
+    //         'incidents.*',
+    //         'ongs.name',
+    //         'ongs.email',
+    //         'ongs.whatsapp',
+    //         'ongs.city',
+    //         'ongs.uf'
+    //     ]);
+        
+    //     response.header("X-Total-Count",count['count(*)'])
+    //     return response.json(incidents);
+    // },
+    async index(req, res) {
+        const { page = 1 } = req.query
+    
+        const [count] = await connection('incidents').count()
+    
         const incidents = await connection('incidents')
-        .join('ongs','omg_id','=','incidents.omg_id')
-        .limit(5)
-        .offset((page - 1) * 5)
-        .select([
+          .join('ongs', 'ongs.id', '=', 'incidents.omg_id')
+          .limit(5)
+          .offset((page - 1) * 5)
+          .select([
             'incidents.*',
             'ongs.name',
             'ongs.email',
             'ongs.whatsapp',
             'ongs.city',
-            'ongs.uf'
-        ]);
-        
-        response.header("X-Total-Count",count['count(*)'])
-        return response.json(incidents);
-    },
+            'ongs.uf'])
+    
+        res.header('X-Total-Count', count['count(*)'])
+    
+        return res.json(incidents)
+      },
+
     async create(request,response){
         const { title, desc, value } = request.body;
         const omg_id = request.headers.authorization;
